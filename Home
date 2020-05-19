@@ -1,0 +1,119 @@
+<header class="jumbotron page-header">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1>{{ provider.name }} API Platform</h1>
+      </div>
+    </div>
+  </div>
+</header>
+
+{% if current_user %}
+  <section class="start">
+  <div class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <h1>Tus credenciales</h1>
+      <br>
+      <p class="lead">
+       Accedé a tus credenciales con el botón de la derecha.
+      </p>
+    </div>
+    <div class="col-md-6" style="padding-top:2em;">
+      <div class="panel panel-default" id="access-details">
+        <div class="panel-heading">
+          <i class="fa fa-key"></i>
+          Credentials
+          {% if current_account.applications.size > 0 %}
+            <a class="pull-right" href="{{ urls.applications }}" title="Applications">
+              <i class="fa fa-chevron-right"></i>
+            </a>
+          {% endif %}
+        </div>
+        <div class="panel-body panel-footer">
+          {% if current_account.applications.size == 0 %}
+            <a href="{{ urls.new_application }}" class="btn btn-primary">Create Application</a>
+          {% elsif current_account.applications.size == 1 %}
+            {% assign app = current_account.applications.first %}
+
+            {% if app.user_key_mode? %}
+              <dl class="dl-horizontal">
+                <dt>App name</dt>
+                <dd><a href="{{ app.url }}">{{ app.name }}</a></dd>
+                <dt>Key</dt>
+                <dd>
+                  <code>{{ app.user_key }}</code>
+                  <p>Add this as a <code>user_key</code> parameter to your API calls to authenticate.</p>
+                </dd>
+              </dl>
+
+            {% elsif app.app_id_mode? %}
+              <dl class="dl-horizontal">
+                <dt>App name</dt>
+                <dd><a href="{{ app.url }}">{{ app.name }}</a></dd>
+                <dt>App ID</dt>
+                <dd><code>{{ app.application_id }}</code></dd>
+                <dt>Key</dt>
+                <dd><code>{{ app.keys.first }}</code></dd>
+              </dl>
+
+            {% elsif app.oauth_mode? %}
+              <dl class="dl-horizontal">
+                <dt>App name</dt>
+                <dd><a href="{{ app.url }}">{{ app.name }}</a></dd>
+                <dt>Client ID</dt>
+                <dd><code>{{ app.application_id }}</code></dd>
+                <dt>Client Secret</dt>
+                <dd><code>{{ app.keys.first }}</code></dd>
+              </dl>
+            {% endif %}
+
+            {% if app.trial? %}
+              <div class="alert alert-warning">
+                <h3>Trial period</h3>
+                <p>{{ app.remaining_trial_period_days }} days remaining.</p>
+              </div>
+            {% endif %}
+
+          {% elsif current_account.applications.size > 1 %}
+            <a href="{{ urls.applications }}" class="btn btn-primary">See your Applications & their credentials</a>
+          {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </section>
+
+{% else %}
+
+  <section class="sell">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <h3>Registrate</h3>
+          <p>
+          <i class="fa fa-sign-in fa-3x pull-left"></i>
+          <a href="{{ urls.signup }}?{{ service_plan | param_filter }}&{{ app_plan | param_filter }}" >Registrate</a> en el Portal para explorar las APIs de {{ provider.name }}
+          </p>
+        </div>
+        <div class="col-md-4">
+          <h3>Obtené tus credenciales</h3>
+          <p>
+          <i class="fa fa-key fa-3x pull-left"></i>
+          Con las credenciales podrás consumir las APIs en modo Sandbox o acceder a tus APIs en desarrollo
+          </p>
+        </div>
+       <div class="col-md-4">
+        <h3>Creá tu aplicación</h3>
+         <p>
+         <i class="fa fa-code fa-3x pull-left"></i>
+         Empezá a desarrollar con tu framework favorito aprovechando toda la potencia de las APIs de {{ provider.name }}
+         </p>
+        </div>
+       </div>
+      </div>
+  </section>
+
+ {% endif %}
