@@ -9,4 +9,4 @@ Features:
 - Main layout: All pages branded with {{ provider.name }} Liquid Drop
 
 How to use:
-- Simply replace the full contents of each page with that provided inside the files in this repo. Keep a backup of your original file's content!
+- Simply replace the full contents of each page with the content provided inside the files in this repo. Keep a backup of your original file's content!
