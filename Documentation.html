@@ -1,0 +1,53 @@
+{% cdn_asset /swagger-ui/2.2.10/swagger-ui.js %}
+{% cdn_asset /swagger-ui/2.2.10/swagger-ui.css %}
+
+{% include 'shared/swagger_ui' %}
+
+<div class="api-list-container" style="display: none;">
+  <h1>Catálogo de APIs de {{ provider.name }}</h1>
+  <p>Explorá las APIs disponibles:<br><br></p>
+</div>
+<div class="DashboardSection-title DashboardSection-toggle documentation">
+  <table class="api-table" style="margin: 0.5rem; width: 100%;">
+  </table>
+</div>
+
+<script type="text/javascript">
+  var services = {
+  {% assign items = provider.services |map: "system_name" %}
+  {% for system_name in items %}
+  "{{ system_name }}": {
+    name: "{{ provider.services[system_name].name|url_encode }}",
+  {% for api_spec in provider.services[system_name].api_specs %}
+    url: "{{ api_spec.url }}",
+  {% endfor %}
+    description: "{{ provider.services[system_name].description|url_encode }}" 
+  },
+  {% endfor %}
+  };
+
+  $( document ).ready(function() {
+    var searchParams = new URLSearchParams(window.parent.location.search) ;
+    if (searchParams.has("api")) {
+      var api = searchParams.get("api");
+      $(".api-list-container").css("display", "none");
+      window.swaggerUi.options['url'] = services[api].url;
+      window.swaggerUi.load();
+    } else {
+      $(".api-list-container").css("display", "block");
+      var system_names = Object.keys(services).sort();
+      for (var i = 0; i < system_names.length; i++) { 
+        var name = system_names[i]; // system_name
+        var description = decodeURIComponent(services[system_names[i]].description.replace(/\+/g, '%20'));
+        if (services[system_names[i]].name != null) { // if present, name is a better option
+          name = decodeURIComponent(services[system_names[i]].name.replace(/\+/g, '%20'));
+        }
+        if (services[system_names[i]].description == "") { //if empty, print "No description"
+            description = "No description";
+      	}
+        $('<tr style="border-style: solid; border-width: thin"><td style="padding: 0.5rem; background-color: #1B4073;"><a style="color: white; font-weight: bold; text-decoration: none"; href="?api=' + system_names[i] + '">' + name + '</td></tr>'+ ('<tr style="border-style: solid; border-width: thin"><td style="padding: 0.5rem; font-size: 11px;">'+ description + '</td></tr><tr style="border-style: none;"><td style="padding: 0.5rem; font-size: 11px;">')).appendTo($(".api-table"));
+      }
+    }
+  });
+
+</script>
